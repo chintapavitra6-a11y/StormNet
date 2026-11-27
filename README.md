@@ -34,30 +34,27 @@ When extreme weather (e.g., cyclones or severe flooding) strikes coastal and urb
 
 ## 3. High-Level Architecture
 
-```
-                    ┌────────────────────────────────────────────────┐
-                    │            MODULE 4: Rescue Dashboard          │
-                    │      (Streamlit Map, Triage List, Health)      │
-                    └───────────────────────▲────────────────────────┘
-                                            │ State Telemetry (REST API)
-    ┌───────────────────────────┬───────────┴───────────────┬───────────────────────────┐
-    │                           │                           │                           │
-┌───┴───────────────────────┐ ┌─┴─────────────────────────┐ ┌─────────────────────────┴───┐
-│   MODULE 2: Intelligence  │ │  MODULE 4: Trust & Sec    │ │   MODULE 3: Local Content     │
-│  - Hankel + DMD Forecast  │ │  - Ed25519 Sign/Verify    │ │  - Pre-storm Cache Planner    │
-│  - QP / ADMM Optimization │ │  - Statistical Anomaly    │ │  - Zeroconf Peer-to-Peer Sync │
-│  - Predictive Router      │ │    Detection (Black-Hole) │ │  - FastAPI Local Portal / TV  │
-└───▲───────────────────────┘ └──▲────────────────────────┘ └─────────────────────────▲───┘
-    │ Plugs into Router API      │ sign() / verify() hooks                             │
-    └───────────────────────────┐│┌────────────────────────────────────────────────────┘
-                                │││
-                    ┌───────────┴┴▼──────────────────────────┐
-                    │        MODULE 1: Simulation Core       │
-                    │   - SimPy Discrete-Event World         │
-                    │   - Node Mobility & Disaster Dynamics  │
-                    │   - Store-and-Forward DTN Buffering    │
-                    │   - Real-World Laptop Sockets (Demo)   │
-                    └────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Top ["Rescue Operations Layer"]
+        M4_DASH["Module 4: Rescue Dashboard<br/>(Streamlit Live Map, Triage List, Network Health)"]
+    end
+
+    subgraph Intelligence ["Intelligence, Trust & Service Layer"]
+        M2["Module 2: Predictive Routing<br/>(Hankel + DMD, QP & ADMM Optimization)"]
+        M4_SEC["Module 4: Security & Statistical Tests<br/>(Ed25519 Sign/Verify, Black-Hole Detection)"]
+        M3["Module 3: Offline Content & Gateway<br/>(Pre-Storm Caching, Zeroconf P2P Sync, Local Portal)"]
+    end
+
+    subgraph Foundation ["Core Mesh & Simulation Layer"]
+        M1["Module 1: Simulation Core & Transport<br/>(SimPy Discrete-Event World, Store-and-Forward DTN, Sockets)"]
+    end
+
+    %% Interactions
+    M1 -->|"Push State Telemetry (REST API)"| M4_DASH
+    M2 -->|"Plugs into Router API (Next-Hop Selection)"| M1
+    M4_SEC -->|"Packet Signing & Anomaly Verification Hooks"| M1
+    M3 -->|"Peer Cache Sync & Gateway Uplink"| M1
 ```
 
 ---
